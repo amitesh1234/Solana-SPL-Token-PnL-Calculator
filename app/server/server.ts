@@ -1,27 +1,15 @@
-import * as readline from 'readline';
-
-// Interface to handle input/output from console
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-// Function to get user input for two fields
-function getInput(question: string): Promise<string> {
-    return new Promise((resolve) => {
-        rl.question(question, (answer) => {
-            resolve(answer);
-        });
-    });
-}
+import { getInput, closeInput } from '../helpers/input';
+import { processData } from '../helpers/processData';
 
 async function main() {
-    const field1 = await getInput("Enter SPL token Address: ");
-    const field2 = await getInput("Enter Wallet Address: ");
-    
-    console.log(`You entered: Field 1 = ${field1}, Field 2 = ${field2}`);
-    
-    rl.close(); // Close the readline interface
+    // const tokenAddress = await getInput("Enter SPL token Address: ");
+    // const walletAddress = await getInput("Enter Wallet Address: ");
+
+    // console.log(`You entered: Token Address = ${tokenAddress}, Wallet Address = ${walletAddress}`);
+
+    closeInput();
+
+    await processData('So11111111111111111111111111111111111111112', '');
 }
 
 main();
