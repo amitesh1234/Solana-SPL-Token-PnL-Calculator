@@ -1,9 +1,9 @@
-import { Connection, PublicKey, ParsedTransactionMeta, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, AccountLayout } from "@solana/spl-token";
-import { LIQUIDITY_STATE_LAYOUT_V4, PoolInfoLayout, Layout } from "@raydium-io/raydium-sdk";
+import { Connection, PublicKey, AccountInfo, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from "@solana/spl-token";
+import { PoolInfoLayout as PoolInfoLayoutAmm } from "@raydium-io/raydium-sdk";
+import { PoolInfoLayout, SqrtPriceMath } from "@raydium-io/raydium-sdk-v2";
 import axios from 'axios';
 import { config } from '../config';
-import BN from 'bn.js';
 
 //This is the interface defined for the transaction data for the particular spl token and user account
 interface TokenTransfer {
@@ -29,63 +29,50 @@ export async function getAssociatedAccountAddress(token: string, walletAddress: 
 
 export async function getHistoricalPrices(token: string, blockNumber: number, poolId: string): Promise<number> {
     try {
-
-
-
         if (token === config?.usdt_address) {
             return 1; //case where the token is usdt only as there is not pair or usdt/usdt in raydium
         }
+        const poolPubkey = new PublicKey(poolId);
+        const connection = new Connection(config?.solana_rpc_url_mainnet, 'confirmed');
+        const accountInfo: AccountInfo<Buffer> | null = await connection.getAccountInfo(poolPubkey, { commitment: 'confirmed', minContextSlot: blockNumber });
+        if (accountInfo) {
+            if(accountInfo.owner.equals(new PublicKey("CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK"))) { //clmm pool
+                const decodedData = PoolInfoLayout.decode(accountInfo.data);
+                console.log(decodedData)
+                return Number(SqrtPriceMath.sqrtPriceX64ToPrice(decodedData.sqrtPriceX64, decodedData.mintDecimalsA, decodedData.mintDecimalsB))
+            } else {
+                const decodedData = PoolInfoLayoutAmm.decode(accountInfo.data); //amm pool
+                return Number(SqrtPriceMath.sqrtPriceX64ToPrice(decodedData.sqrtPriceX64, decodedData.mintDecimalsA, decodedData.mintDecimalsB))
+            }
+            
+        }
+
         return -1;
-        // const resp = await axios.get(`${config?.raydium_base_url}?mint1=${token}&mint2=${config?.usdt_address}&poolType=all&poolSortField=liquidity&sortType=desc&pageSize=1&page=1`);
-
-        // console.log(resp?.data?.data?.data[0]);
-        // const poolPubkey = new PublicKey(resp?.data?.data?.data[0]?.id);
-        // const connection = new Connection(config?.solana_rpc_url_mainnet, 'confirmed');
-
-        // const poolAccountInfo = await connection.getAccountInfo(new PublicKey("7XawhbbxtsRcQA8KTkHT9f9nc6d69UwqCDh6U5EEbEmX"), {
-        //     commitment: 'finalized',
-        // });
-
-
-        // if (poolAccountInfo) {
-        //     // console.log(poolAccountInfo.data)
-
-        //     const poolData = LIQUIDITY_STATE_LAYOUT_V4.decode(poolAccountInfo.data);
-        //     console.log(poolData)
-        //     // const baseDecimals = poolData.baseDecimal;
-        //     // const quoteDecimals = poolData.quoteDecimal;
-
-        //     // const baseLotSize = new BN(poolData.baseLotSize);
-        //     // const quoteLotSize: BN = new BN(poolData.quoteLotSize);
-
-        //     // const swapBaseInAmount: BN = (poolData.swapBaseInAmount);
-        //     // const swapQuoteOutAmount: BN = (poolData.swapQuoteOutAmount);
-        //     // console.log(baseDecimals.toString(), quoteDecimals.toString(), swapBaseInAmount.toString(), swapQuoteOutAmount.toString())
-
-        //     // // Normalize values by decimals using BN.js
-        //     // const normalizedSwapBaseIn: BN = swapBaseInAmount.div(new BN(10).pow(new BN(baseDecimals)));
-        //     // const normalizedSwapQuoteOut: BN = swapQuoteOutAmount.div(new BN(10).pow(new BN(quoteDecimals)));
-
-        //     // // Calculate price of the base token in quote token
-        //     // const price: BN = normalizedSwapQuoteOut.div(normalizedSwapBaseIn);
-
-        //     // console.log('Price of base token in quote token at that timestamp:', price.toString());
-        //     return 1; // Return as string to avoid precision loss
-        // }
-
-        // return -1;
     } catch (err) {
-        console.log("Error in [getTokenTransactions]: ", err);
+        // console.log("Error in [getTokenTransactions]: ", err);
         return -1;
     }
 }
 
 export async function getHistoricalSOLPrice(blockNumber: number): Promise<number> {
     try {
-
+        const poolPubkey = new PublicKey(config?.sol_pool_id);
+        const connection = new Connection(config?.solana_rpc_url_mainnet, 'confirmed');
+        const accountInfo: AccountInfo<Buffer> | null = await connection.getAccountInfo(poolPubkey, { commitment: 'confirmed', minContextSlot: blockNumber });
+        if (accountInfo) {
+            if(accountInfo.owner.equals(new PublicKey("CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK"))) { //clmm pool
+                const decodedData = PoolInfoLayout.decode(accountInfo.data);
+                console.log(decodedData)
+                return Number(SqrtPriceMath.sqrtPriceX64ToPrice(decodedData.sqrtPriceX64, decodedData.mintDecimalsA, decodedData.mintDecimalsB))
+            } else {
+                const decodedData = PoolInfoLayoutAmm.decode(accountInfo.data); //amm pool
+                return Number(SqrtPriceMath.sqrtPriceX64ToPrice(decodedData.sqrtPriceX64, decodedData.mintDecimalsA, decodedData.mintDecimalsB))
+            }
+            
+        }
         return -1;
     } catch (err) {
-        console.log("Error in [getTokenTransactions]: ", err);
+        // console.log("Error in [getTokenTransactions]: ", err);
         return -1;
     }
 }
@@ -157,7 +144,7 @@ export async function getTokenTransactions(walletAddress: string, token: string)
         }
         return allTransactions;
     } catch (err) {
-        console.log("Error in [getTokenTransactions]: ", err);
+        // console.log("Error in [getTokenTransactions]: ", err);
         return [];
     }
 }

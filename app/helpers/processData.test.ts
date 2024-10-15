@@ -96,7 +96,7 @@ describe('processData', () => {
 
         await processData(token, walletAddress);
 
-        expect(consoleSpy).toHaveBeenCalledWith('Error in the process');
+        expect(consoleSpy).toHaveBeenCalledWith('Error in the process related to either token addres sor wallet address or fetcheing current sol price');
         consoleSpy.mockRestore();
     });
 
@@ -111,7 +111,7 @@ describe('processData', () => {
 
         await processData(token, walletAddress);
 
-        expect(consoleSpy).toHaveBeenCalledWith('Error in the process');
+        expect(consoleSpy).toHaveBeenCalledWith('Error in the process related to either token addres sor wallet address or fetcheing current sol price');
         consoleSpy.mockRestore();
     });
 

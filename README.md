@@ -27,3 +27,7 @@ All Updateable configs are localised in ./app/config.
 
 
 npm start enters the code in ./app/server/server.ts
+
+
+
+Note: RPC endpoint can fail , if it does, please rerun the code or change the rpc url in ./app/config/config.json
