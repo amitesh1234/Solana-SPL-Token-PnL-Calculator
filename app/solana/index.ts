@@ -27,7 +27,7 @@ export async function getAssociatedAccountAddress(token: string, walletAddress: 
     return (await getAssociatedTokenAddress(tokenPubKey, walletPubKey)).toString();
 }
 
-export async function getHistoricalPrices(token: string, blockNumber: number): Promise<number> {
+export async function getHistoricalPrices(token: string, blockNumber: number, poolId: string): Promise<number> {
     try {
 
 
@@ -35,42 +35,53 @@ export async function getHistoricalPrices(token: string, blockNumber: number): P
         if (token === config?.usdt_address) {
             return 1; //case where the token is usdt only as there is not pair or usdt/usdt in raydium
         }
-        const resp = await axios.get(`${config?.raydium_base_url}?mint1=${token}&mint2=${config?.usdt_address}&poolType=all&poolSortField=liquidity&sortType=desc&pageSize=1&page=1`);
+        return -1;
+        // const resp = await axios.get(`${config?.raydium_base_url}?mint1=${token}&mint2=${config?.usdt_address}&poolType=all&poolSortField=liquidity&sortType=desc&pageSize=1&page=1`);
 
-        console.log(resp?.data?.data?.data[0]);
-        const poolPubkey = new PublicKey(resp?.data?.data?.data[0]?.id);
-        const connection = new Connection(config?.solana_rpc_url_mainnet, 'confirmed');
+        // console.log(resp?.data?.data?.data[0]);
+        // const poolPubkey = new PublicKey(resp?.data?.data?.data[0]?.id);
+        // const connection = new Connection(config?.solana_rpc_url_mainnet, 'confirmed');
 
-        const poolAccountInfo = await connection.getAccountInfo(new PublicKey("7XawhbbxtsRcQA8KTkHT9f9nc6d69UwqCDh6U5EEbEmX"), {
-            commitment: 'finalized',
-        });
+        // const poolAccountInfo = await connection.getAccountInfo(new PublicKey("7XawhbbxtsRcQA8KTkHT9f9nc6d69UwqCDh6U5EEbEmX"), {
+        //     commitment: 'finalized',
+        // });
 
 
-        if (poolAccountInfo) {
-            // console.log(poolAccountInfo.data)
+        // if (poolAccountInfo) {
+        //     // console.log(poolAccountInfo.data)
 
-            const poolData = LIQUIDITY_STATE_LAYOUT_V4.decode(poolAccountInfo.data);
-            console.log(poolData)
-            // const baseDecimals = poolData.baseDecimal;
-            // const quoteDecimals = poolData.quoteDecimal;
+        //     const poolData = LIQUIDITY_STATE_LAYOUT_V4.decode(poolAccountInfo.data);
+        //     console.log(poolData)
+        //     // const baseDecimals = poolData.baseDecimal;
+        //     // const quoteDecimals = poolData.quoteDecimal;
 
-            // const baseLotSize = new BN(poolData.baseLotSize);
-            // const quoteLotSize: BN = new BN(poolData.quoteLotSize);
+        //     // const baseLotSize = new BN(poolData.baseLotSize);
+        //     // const quoteLotSize: BN = new BN(poolData.quoteLotSize);
 
-            // const swapBaseInAmount: BN = (poolData.swapBaseInAmount);
-            // const swapQuoteOutAmount: BN = (poolData.swapQuoteOutAmount);
-            // console.log(baseDecimals.toString(), quoteDecimals.toString(), swapBaseInAmount.toString(), swapQuoteOutAmount.toString())
+        //     // const swapBaseInAmount: BN = (poolData.swapBaseInAmount);
+        //     // const swapQuoteOutAmount: BN = (poolData.swapQuoteOutAmount);
+        //     // console.log(baseDecimals.toString(), quoteDecimals.toString(), swapBaseInAmount.toString(), swapQuoteOutAmount.toString())
 
-            // // Normalize values by decimals using BN.js
-            // const normalizedSwapBaseIn: BN = swapBaseInAmount.div(new BN(10).pow(new BN(baseDecimals)));
-            // const normalizedSwapQuoteOut: BN = swapQuoteOutAmount.div(new BN(10).pow(new BN(quoteDecimals)));
+        //     // // Normalize values by decimals using BN.js
+        //     // const normalizedSwapBaseIn: BN = swapBaseInAmount.div(new BN(10).pow(new BN(baseDecimals)));
+        //     // const normalizedSwapQuoteOut: BN = swapQuoteOutAmount.div(new BN(10).pow(new BN(quoteDecimals)));
 
-            // // Calculate price of the base token in quote token
-            // const price: BN = normalizedSwapQuoteOut.div(normalizedSwapBaseIn);
+        //     // // Calculate price of the base token in quote token
+        //     // const price: BN = normalizedSwapQuoteOut.div(normalizedSwapBaseIn);
 
-            // console.log('Price of base token in quote token at that timestamp:', price.toString());
-            return 1; // Return as string to avoid precision loss
-        }
+        //     // console.log('Price of base token in quote token at that timestamp:', price.toString());
+        //     return 1; // Return as string to avoid precision loss
+        // }
+
+        // return -1;
+    } catch (err) {
+        console.log("Error in [getTokenTransactions]: ", err);
+        return -1;
+    }
+}
+
+export async function getHistoricalSOLPrice(blockNumber: number): Promise<number> {
+    try {
 
         return -1;
     } catch (err) {
@@ -78,7 +89,6 @@ export async function getHistoricalPrices(token: string, blockNumber: number): P
         return -1;
     }
 }
-
 
 //Get current price from raydium
 export async function getCurrentPrice(token: string): Promise<CurrentPrice> {

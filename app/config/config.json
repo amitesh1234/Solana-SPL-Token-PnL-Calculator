@@ -4,5 +4,6 @@
     "solaba_pricing_url": "",
     "transaction_batch_size": 1,
     "raydium_base_url": "https://api-v3.raydium.io/pools/info/mint",
-    "usdt_address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+    "usdt_address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "sol_address": "So11111111111111111111111111111111111111112" 
 }
