@@ -1,10 +1,11 @@
-import { getTokenTransactions, getCurrentPrice } from '../solana';
+import { getTokenTransactions, getCurrentPrice, getHistoricalPrices } from '../solana';
 
 
 
 export async function processData(token: string, walletAddress: string) {
     try {
         console.log("[processData]");
+
         const [transactionData, currentPrice] = await Promise.all([getTokenTransactions(walletAddress, token), getCurrentPrice(token)]);
         if (transactionData.length === 0 || currentPrice === -1) {
             console.log("Error in the process");
@@ -12,7 +13,9 @@ export async function processData(token: string, walletAddress: string) {
         }
         let totalBought = 0;
         let totalSold = 0;
-        transactionData.forEach(transfer => {
+        console.log(transactionData)
+        transactionData.forEach(async(transfer) => {
+            // const historicalPrice = await getHistoricalPrices(token, transfer.slot);
             if (transfer.type === "buy") {
                 totalBought += transfer.amount;
             } else {
