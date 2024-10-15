@@ -25,7 +25,7 @@ describe('processData', () => {
             { type: 'buy', amount: 10, slot: 1, fee: 0.001, time: 1728927674 },
             { type: 'sell', amount: 5, slot: 2 , fee: 0.001, time: 1728927675},
         ]);
-        getCurrentPrice.mockResolvedValueOnce(2); // Current price for the token
+        getCurrentPrice.mockResolvedValueOnce({price: 2, poolId: "qwe"}); // Current price for the token
 
         const consoleSpy = jest.spyOn(console, 'log');
         await processData(token, walletAddress);
@@ -55,7 +55,7 @@ describe('processData', () => {
         getTokenTransactions.mockResolvedValueOnce([
             { type: 'buy', amount: 10, slot: 1 },
         ]);
-        getCurrentPrice.mockResolvedValueOnce(-1); // Invalid price
+        getCurrentPrice.mockResolvedValueOnce({price: -1, poolId: "qwe"}); // Invalid price
 
         const consoleSpy = jest.spyOn(console, 'log');
 

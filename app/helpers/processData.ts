@@ -7,13 +7,13 @@ export async function processData(token: string, walletAddress: string) {
         console.log("[processData]");
 
         const [transactionData, currentPrice] = await Promise.all([getTokenTransactions(walletAddress, token), getCurrentPrice(token)]);
-        if (transactionData.length === 0 || currentPrice === -1) {
+        if (transactionData.length === 0 || currentPrice.price === -1) {
             console.log("Error in the process");
             return;
         }
         let totalBought = 0;
         let totalSold = 0;
-        console.log(transactionData)
+
         transactionData.forEach(async(transfer) => {
             // const historicalPrice = await getHistoricalPrices(token, transfer.slot);
             if (transfer.type === "buy") {
@@ -24,8 +24,8 @@ export async function processData(token: string, walletAddress: string) {
         });
 
         const totalTokensHeld = totalBought - totalSold;
-        const costBasis = totalBought * currentPrice; // Assuming purchase price is the current price for simplicity
-        const currentValue = totalTokensHeld * currentPrice;
+        const costBasis = totalBought * currentPrice.price; // Assuming purchase price is the current price for simplicity
+        const currentValue = totalTokensHeld * currentPrice.price;
         const unrealizedPnL = currentValue - costBasis;
 
         console.log(`Total tokens held: ${totalTokensHeld}`);
