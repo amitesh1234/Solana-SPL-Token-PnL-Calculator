@@ -1,6 +1,6 @@
 {
-    "solana_rpc_url": "https://api.devnet.solana.com",
-    "solana_rpc_url_mainnet": "https://api.devnet.solana.com",
+    "solana_rpc_url": "https://api.mainnet-beta.solana.com/",
+    "solana_rpc_url_mainnet": "https://api.mainnet-beta.solana.com/",
     "solaba_pricing_url": "",
     "transaction_batch_size": 1,
     "raydium_base_url": "https://api-v3.raydium.io/pools/info/mint",

@@ -2,14 +2,14 @@ import { getTokenTransactions, getCurrentPrice, getHistoricalPrices, getHistoric
 import { config } from '../config';
 
 
-export async function processData(token: string, walletAddress: string, mainnetTokenAddress: string) {
+export async function processData(token: string, walletAddress: string) {
     try {
         console.log("[processData]");
         // const d = await getHistoricalPrices('So11111111111111111111111111111111111111112', 295582400, '3nMFwZXwY1s1M5s8vYAHqd4wGs4iSxXE4LRoUMMYqEgF');
         
         // return;
 
-        const [transactionData, currentPrice, currentSolPrice] = await Promise.all([getTokenTransactions(walletAddress, token), getCurrentPrice(mainnetTokenAddress), getCurrentPrice(config?.sol_address)]);
+        const [transactionData, currentPrice, currentSolPrice] = await Promise.all([getTokenTransactions(walletAddress, token), getCurrentPrice(token), getCurrentPrice(config?.sol_address)]);
         if (transactionData.length === 0 || currentPrice.price === -1 || !currentPrice.price) {
             console.log("Error in the process related to either token addres sor wallet address or fetcheing current sol price");
             return;
